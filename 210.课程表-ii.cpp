@@ -6,10 +6,12 @@
 
 // @lc code=start
 #include <cmath>
-#include <new>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+using namespace std;
+// 这道题有待算法改进，使用标志确定节点遍历状态(未搜索，搜索中，搜索完毕)，省去Requirments结构体的开销
+// 使用深度优先遍历，将遍历完毕（周围没有未搜索的节点）的节点放入栈中，回溯，若发现将周围节点遍历时出现搜索中节点，则存在环状结构没有拓扑排序
 class Solution {
 public:
   struct Requirements {
