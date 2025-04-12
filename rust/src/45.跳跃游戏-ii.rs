@@ -3,8 +3,9 @@
  *
  * [45] 跳跃游戏 II
  */
-
+pub struct Solution;
 // @lc code=start
+
 impl Solution {
     pub fn jump(nums: Vec<i32>) -> i32 {
         //  没有使用迭代器实现

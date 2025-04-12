@@ -15,7 +15,7 @@ impl Solution {
         let mut res: i32 = 1;
         //当前严格单调递减次数
         let mut dec: i32 = 0;
-        //记录最近一次单调递增区间长度
+        //记录最近一次严格单调递增区间长度
         let mut inc: i32 = 1;
         for i in 1..ratings.len() {
             if ratings[i] >= ratings[i - 1] {

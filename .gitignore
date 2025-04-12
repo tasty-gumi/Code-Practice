@@ -2,3 +2,7 @@
 main.rs
 main
 main.cpp
+rust/target/*
+
+
+*.o
