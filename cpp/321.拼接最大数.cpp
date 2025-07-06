@@ -4,79 +4,79 @@
  * [321] 拼接最大数
  */
 
+#include <vector>
+using namespace std;
 // @lc code=start
 class Solution {
 public:
   vector<int> maxNumber(vector<int> &nums1, vector<int> &nums2, int k) {
-    vector<int> res;
-    int total_remove = nums1.size() + nums2.size() - k;
-    vector<int> nums1stack;
-    vector<int> nums2stack;
-    int lp = 0, rp = 0;
+    int m = nums1.size(), n = nums2.size();
+    vector<int> res(k, 0);
+    vector<int> part1;
+    vector<int> part2;
+    vector<int> candidate;
 
-    // 构造单调递减栈
-    while (total_remove > 0) {
-      while (lp < nums1.size() &&
-             (nums1stack.empty() || nums1stack.back() >= nums1[lp])) {
-        nums1stack.push_back(nums1[lp++]);
-      }
-      while (rp < nums2.size() &&
-             (nums2stack.empty() || nums2stack.back() >= nums2[rp])) {
-        nums2stack.push_back(nums2[rp++]);
-      }
+    for (int i = max(0, k - n); i <= min(k, m); i++) {
+      int j = k - i;
+      pickMax(nums1, i, part1);
+      pickMax(nums2, j, part2);
+      merge(part1, part2, candidate);
 
-      // 比较原始数组的当前元素
-      if (lp < nums1.size() && rp < nums2.size()) {
-        if (compare(nums1, lp, nums2, rp)) {
-          nums2stack.pop_back();
-        } else {
-          nums1stack.pop_back();
-        }
-      } else if (lp < nums1.size()) {
-        nums1stack.pop_back();
-      } else if (rp < nums2.size()) {
-        nums2stack.pop_back();
-      }
-      --total_remove;
-    }
-
-    // 将剩余元素加入栈
-    while (lp < nums1.size()) {
-      nums1stack.push_back(nums1[lp++]);
-    }
-    while (rp < nums2.size()) {
-      nums2stack.push_back(nums2[rp++]);
-    }
-
-    // 合并两个栈
-    lp = 0;
-    rp = 0;
-    while (k--) {
-      if (lp < nums1stack.size() && rp < nums2stack.size()) {
-        if (compare(nums1, lp, nums2, rp)) {
-          res.push_back(nums1stack[lp++]);
-        } else {
-          res.push_back(nums2stack[rp++]);
-        }
-      } else if (lp < nums1stack.size()) {
-        res.push_back(nums1stack[lp++]);
-      } else {
-        res.push_back(nums2stack[rp++]);
+      if (candidate > res) {
+        res.swap(candidate);
       }
     }
     return res;
   }
 
 private:
-  bool compare(const vector<int> &nums1, int i, const vector<int> &nums2,
-               int j) {
-    // 比较从索引 i 和 j 开始的两个数组
-    while (i < nums1.size() && j < nums2.size() && nums1[i] == nums2[j]) {
-      ++i;
-      ++j;
+  // 单调栈选择最大子序列
+  void pickMax(vector<int> &nums, int k, vector<int> &stk) {
+    stk.clear();
+    if (k <= 0)
+      return;
+    int n = nums.size();
+    int drop = n - k; // 需要丢弃的元素数量
+
+    for (int num : nums) {
+      while (!stk.empty() && drop > 0 && stk.back() < num) {
+        stk.pop_back();
+        drop--;
+      }
+      if (stk.size() < k) {
+        stk.push_back(num);
+      } else {
+        drop--; // 直接丢弃当前元素
+      }
     }
-    return j == nums2.size() ||
-           (i < nums1.size() && (j == nums2.size() || nums1[i] > nums2[j]));
+  }
+
+  // 合并两个子序列
+  void merge(vector<int> &nums1, vector<int> &nums2, vector<int> &candi) {
+    candi.clear();
+    auto it1 = nums1.begin(), it2 = nums2.begin();
+
+    while (it1 != nums1.end() || it2 != nums2.end()) {
+      // 自定义比较函数：比较两个序列的字典序
+      auto cmp = [&] {
+        auto i = it1, j = it2;
+        while (i != nums1.end() && j != nums2.end()) {
+          if (*i != *j)
+            return *i < *j;
+          ++i;
+          ++j;
+        }
+        // 如果nums2还有剩余元素，则nums1 < nums2
+        return j != nums2.end();
+      };
+
+      // 选择字典序更大的序列的当前元素
+      if (it2 == nums2.end() || (it1 != nums1.end() && !cmp())) {
+        candi.push_back(*it1++);
+      } else {
+        candi.push_back(*it2++);
+      }
+    }
   }
 };
 // @lc code=end
