@@ -13,13 +13,14 @@ public:
     int n = nums.size();
     vector<int> res;
     deque<std::pair<int, int>> desc_q;
+    int c;
     for (int i = 0; i < n; ++i) {
-      int c = 1;
+      c = 1;
       while (!desc_q.empty() && desc_q.back().first <= nums[i]) {
         c += desc_q.back().second;
         desc_q.pop_back();
       }
-      desc_q.push_back({nums[i], c});
+      desc_q.emplace_back(nums[i], c);
       if (i >= k - 1) {
         res.emplace_back(desc_q.front().first);
         --desc_q.front().second;
