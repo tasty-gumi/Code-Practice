@@ -25,36 +25,38 @@ struct ListNode {
  */
 class Solution {
 public:
-  void reverse_k(std::vector<ListNode *> &nodes, int k) {
-    for (int i = 1; i < k; ++i) {
-      nodes[i]->next = nodes[i - 1];
+  // 将收集的k个
+  ListNode *reverse_k(ListNode *head, ListNode *tail) {
+    ListNode *prev = tail->next;
+    ListNode *curr = head;
+    while (prev != tail) {
+      ListNode *tmp = curr->next;
+      curr->next = prev;
+      prev = curr;
+      curr = tmp;
     }
-    nodes[0]->next = nullptr;
+    return prev;
   }
 
   ListNode *reverseKGroup(ListNode *head, int k) {
-    if (k == 1)
+    if (k <= 1 || head == nullptr)
       return head;
-    ListNode *pos = head, *tmp;
-    ListNode dummy(0, head), *tail = &dummy;
-    std::vector<ListNode *> nodes;
-    nodes.reserve(k);
-    while (pos) {
-      if (nodes.size() < k) {
-        nodes.emplace_back(pos);
-        pos = pos->next;
-      } else {
-        reverse_k(nodes, k);
-        tail->next = nodes[k - 1];
-        tail = nodes[0];
-        nodes.clear();
+    ListNode dummy(0, head);
+    ListNode *prevGroup = &dummy;
+    while (true) {
+      ListNode *kth = prevGroup;
+      // 找到k个节点，如果少于k个直接返回
+      for (int i = 0; i < k; i++) {
+        kth = kth->next;
+        if (kth == nullptr)
+          return dummy.next;
       }
-    }
-    if (nodes.size() == k) {
-      reverse_k(nodes, k);
-      tail->next = nodes[k - 1];
-    } else {
-      tail->next = nodes[0];
+      ListNode *groupNext = kth->next;
+      ListNode *newHead = reverse_k(prevGroup->next, kth);
+      ListNode *groupTail = prevGroup->next;
+      prevGroup->next = newHead;
+      groupTail->next = groupNext;
+      prevGroup = groupTail;
     }
     return dummy.next;
   }
