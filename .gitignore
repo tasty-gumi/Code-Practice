@@ -3,6 +3,7 @@ main.rs
 main
 main.cpp
 rust/target/*
+target/*
 
 
 *.o
